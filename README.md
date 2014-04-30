@@ -8,18 +8,19 @@ Talks to the http://phish.in API. Has built-in caching.
 
 ## Installation
 
-		gem install phishin-client
+    gem install phishin-client
 
 
 ## Getting Started
 
-	require 'phishin-client'
-	doglogger = Logger.new
-	c = Phishin::Client.new log: true, logger: doglogger
+```ruby
+require 'phishin-client'
+doglogger = Logger.new
+c = Phishin::Client.new log: true, logger: doglogger
 
-	response = c.get_tracks(page: 1, per_page: 40)  # Phishin::Api::Response instance
-	json_hash = response.data
-
+response = c.get_tracks(page: 1, per_page: 40)  # Phishin::Api::Response instance
+json_hash = response.data
+```
 
 ## License
 
