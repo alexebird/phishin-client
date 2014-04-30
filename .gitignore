@@ -1,0 +1,14 @@
+.DS_Store
+coverage/*
+data/*
+tmp/*
+.tags
+.tags_sorted_by_file
+.yardoc/*
+doc/*
+.ruby-gemset
+.ruby-version
+*.gem
+.bundle/
+bin/
+*.swp
