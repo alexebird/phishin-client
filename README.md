@@ -24,7 +24,7 @@ json_hash = response.data
 
 ## License
 
-Please see [LICENSE](https://github.com/alexebird/phishin-client/blob/master/LICENSE).
+Please see [LICENSE](https://github.com/alexebird/phishin-client/blob/master/LICENSE.txt).
 
 
 ## Author
