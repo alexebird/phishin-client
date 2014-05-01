@@ -5,7 +5,7 @@ module Phishin
       HEADERS = { 'accept' => 'application/json' }
       DEFAULT_PARAMS = %i[page per_page sort_attr sort_dir]
 
-      # @param id_or_slug [String,Integer] track id or slug
+      # @param id_or_slug [String,Integer] id or slug belonging to the the resource
       def get_track(id_or_slug)
         check_id_arg('track', id_or_slug)
         perform_get_request('tracks/%s.json' % id_or_slug.to_s)
