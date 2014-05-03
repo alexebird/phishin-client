@@ -17,14 +17,11 @@ module Phishin
           @total_pages = response_data['total_pages']
           @page = response_data['page']
           @data = response_data['data']
+          @data = @data.is_a?(Hash) ? Hashie::Mash.new(@data) : @data.map{ |d| d.is_a?(Hash) ? Hashie::Mash.new(d) : d }
         else
           @message = response_data['message']
           raise Phishin::Client::UnsuccessfulResponseError.new(url, @message)
         end
-      end
-
-      def [](key)
-        return @data[key]
       end
 
       def success?

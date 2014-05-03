@@ -18,7 +18,7 @@ require 'phishin-client'
 doglogger = Logger.new
 c = Phishin::Client.new log: true, logger: doglogger
 
-response = c.get_tracks(page: 1, per_page: 40)  # Phishin::Api::Response instance
+response = c.tracks(page: 1, per_page: 40)  # Phishin::Api::Response instance
 json_hash = response.data
 ```
 
