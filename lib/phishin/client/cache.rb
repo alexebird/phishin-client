@@ -1,16 +1,27 @@
 module Phishin
   module Client
     class Cache
+
+      CACHE_NAMESPACE = 'phishin-client'
+
       class << self
 
         @enabled = nil
         @underlying_cache = nil
 
         # @api private
-        def setup(servers, options)
-          expires_in = options[:expires_in] || nil
+        def setup(opts={})
           @enabled = true
-          @underlying_cache = Dalli::Client.new(servers, namespace: 'phishin-client', expires_in: expires_in)
+
+          #require 'dalli'
+          #@underlying_cache = MemcachedCache.new(opts)
+          require 'redis'
+          @underlying_cache = RedisCache.new(opts)
+        end
+
+        # @api private
+        def should_cache?
+          return @enabled && !!@underlying_cache
         end
 
         def enable
@@ -22,23 +33,31 @@ module Phishin
         end
 
         def read(key)
-          return nil unless @enabled
+          return nil unless should_cache?
+
           val = @underlying_cache.get(key)
-          ::Phishin::Client::Client.logger.info "phish.in cache read" if ::Phishin::Client::Client.logger && val
+          log_cache_action('read', key, val) if val
           return val
         end
 
         def write(key, value, ttl=nil)
-          return unless @enabled
-          ::Phishin::Client::Client.logger.info "phish.in cache write" if ::Phishin::Client::Client.logger
+          return nil unless should_cache?
+
+          log_cache_action('write', key, value)
           @underlying_cache.set(key, value, ttl)
         end
 
         def delete(key)
-          return nil unless @enabled
+          return nil unless should_cache?
+
           val = @underlying_cache.delete(key)
-          ::Phishin::Client::Client.logger.info "phish.in cache delete" if ::Phishin::Client::Client.logger && val
+          log_cache_action('delete', key) if val
           return val
+        end
+
+        # @api private
+        def log_cache_action(action, key, val=nil)
+          ::Phishin::Client::Client.logger.info "phish.in cache #{action} key=#{key[0..8]}" if ::Phishin::Client::Client.logger
         end
 
         def fetch(key, ttl=nil)
@@ -49,6 +68,50 @@ module Phishin
           end
           return value
         end
+      end
+    end
+
+    class RedisCache
+      def initialize(opts={})
+        @expires_in = opts[:expires_in] || nil
+        @client = Redis.new
+      end
+
+      def get(key)
+        @client.get(namespace_key(key))
+      end
+
+      def set(key, value, ttl=nil)
+        ttl ||= @expires_in
+        @client.set(namespace_key(key), value, { ex: ttl })
+      end
+
+      def delete(key)
+        @client.del(namespace_key(key))
+      end
+
+      private
+
+      def namespace_key(key)
+        format('%s:%s', Cache::CACHE_NAMESPACE, key)
+      end
+    end
+
+    class MemcachedCache
+      def initialize(opts={})
+        expires_in = opts[:expires_in] || nil
+        servers    = opts[:servers]
+        @client = Dalli::Client.new(servers, namespace: Cache::CACHE_NAMESPACE, expires_in: expires_in)
+      end
+
+      def get(key)
+      end
+
+      def set(key, value, ttl=nil)
+        @client.set(key, value, ttl)
+      end
+
+      def delete(key)
       end
     end
   end

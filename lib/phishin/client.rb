@@ -1,7 +1,6 @@
 require 'rest-client'
 require 'oj'
 require 'hashie'
-require 'dalli'
 
 require 'phishin/api'
 require 'phishin/api/v1'

@@ -129,7 +129,7 @@ module Phishin
       def perform_get_request(path, params={})
         url = [BASE_URL, path].join("/")
 
-        key = [url, [params.to_a.sort.map{|e| e.join('=')}].join('&')].join('?')
+        key = [path, [params.to_a.sort.map{|e| e.join('=')}].join('&')].join('?')
 
         json_str = ::Phishin::Client::Cache.fetch(key) do
           logger.info "phish.in api GET url=#{url} params=#{params}" if logger
