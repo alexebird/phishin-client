@@ -74,10 +74,10 @@ module Phishin
     class RedisCache
       def initialize(opts={})
         @expires_in = opts.delete(:expires_in)
-        db = opts.delete(:db)
-        @client = Redis.new(db: db)
+        url = opts.delete(:url)
+        @client = Redis.new(url: url)
         cli = @client.client
-        ::Phishin::Client::Client.logger.info "initialized phish.in cache Redis client redis://redis:REDACTED@#{cli.host}:#{cli.port}/#{cli.db}" if ::Phishin::Client::Client.logger
+        ::Phishin::Client::Client.logger.info "initialized phish.in cache Redis client redis://:REDACTED@#{cli.host}:#{cli.port}/#{cli.db}" if ::Phishin::Client::Client.logger
       end
 
       def get(key)
