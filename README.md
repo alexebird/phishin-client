@@ -16,11 +16,14 @@ Talks to the http://phish.in API. Has built-in caching.
 ```ruby
 require 'phishin-client'
 doglogger = Logger.new
-c = Phishin::Client.new log: true, logger: doglogger, memcached_servers: ['localhost:11211']
-# to not use caching, don't specify the :memcached_servers option.
+c = Phishin::Client.new log: true, logger: doglogger, cache_options: { memcached_servers: ['localhost:11211'] }
+# to not use caching, don't specify the :cache => false option
 
-response = c.tracks(page: 1, per_page: 40)  # Phishin::Api::Response instance
+response = c.tracks(params: { page: 1, per_page: 40 })  # Phishin::Api::Response instance
 json_hash = response.data
+
+# no caching for this request
+response = c.tracks(params: { page: 1, per_page: 40 }, force: true)  # Phishin::Api::Response instance
 ```
 
 ## License

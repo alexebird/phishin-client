@@ -60,11 +60,16 @@ module Phishin
           ::Phishin::Client::Client.logger.info "phish.in cache #{action} key=#{key[0..8]}" if ::Phishin::Client::Client.logger
         end
 
-        def fetch(key, ttl=nil)
-          value = read(key)
-          if !value
+        # @option opts [Integer] :ttl time to live
+        # @option opts [Boolean] :force don't use cache
+        def fetch(key, opts={})
+          ttl = opts.delete(:ttl)
+          force = opts.delete(:force)
+          value = read(key) unless force
+
+          if force || !value
             value = yield
-            write(key, value, ttl)
+            write(key, value, ttl) unless force
           end
           return value
         end
@@ -73,6 +78,7 @@ module Phishin
 
     class RedisCache
       def initialize(opts={})
+        opts ||= {}
         @expires_in = opts.delete(:expires_in)
         url = opts.delete(:url)
         @client = Redis.new(url: url)

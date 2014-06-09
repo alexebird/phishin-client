@@ -3,121 +3,136 @@ module Phishin
     module V1
       BASE_URL = 'http://phish.in/api/v1'
       HEADERS = { 'accept' => 'application/json' }
-      DEFAULT_PARAMS = %i[page per_page sort_attr sort_dir]
 
       # Get track by id.
       #
       # @param id [Integer] id belonging to the the resource
-      def track(id)
+      # @option opts [Boolean] :force (false) no caching for this request
+      def track(id, opts={})
         check_id_arg('track', id)
-        perform_get_request('tracks/%d.json' % id)
+        perform_get_request(format('tracks/%d.json', id), nil, opts)
       end
 
       # Get many tracks.
       #
-      # @option opts [Integer] :page The desired page
-      # @option opts [Integer] :per_page Results per page
+      # For more on available params, see http://phish.in/api-docs.
+      #
+      # @option opts (see #track)
+      # @option opts [Hash] :params parameters for HTTP GET query string
+      #   - :page (Integer) The desired page
+      #   - :per_page (Integer) Results per page
+      #   - :sort_attr (String) Sorting attribute
+      #   - :sort_dir  (String) Sorting direction (ASC|DESC)
       def tracks(opts={})
-        perform_get_request('tracks.json', select_params(opts, DEFAULT_PARAMS))
+        perform_get_request('tracks.json', opts)
       end
 
 
       # Get show by id or slug (ie, date).
       #
       # @param id_or_slug [Integer] id or slug belonging to the the resource
-      def show(id_or_slug)
+      # @option opts (see #track)
+      def show(id_or_slug, opts={})
         check_id_arg('show', id_or_slug)
-        perform_get_request('shows/%s.json' % id_or_slug.to_s)
+        perform_get_request(format('shows/%s.json', id_or_slug.to_s), opts)
       end
 
       # Get many shows.
       #
-      # @option (see #tracks)
+      # @option opts (see #tracks)
       def shows(opts={})
-        perform_get_request('shows.json', select_params(opts, DEFAULT_PARAMS))
+        perform_get_request('shows.json', opts)
       end
 
       # Get show by date (YYYY-MM-DD).
       #
       # @param show_date [String] a show date in the format YYYY-MM-DD
+      # @option opts (see #track)
       # @raise [Phishin::Cilent::Error] if the date format is wrong
-      def show_on_date(show_date)
+      def show_on_date(show_date, opts={})
         raise Phishin::Client::Error, "invalid argument: show_date must match YYYY-MM-DD" unless show_date && show_date =~ /\d{4}-\d{2}-\d{2}/
-        perform_get_request('show-on-date/%s.json' % show_date)
+        perform_get_request(format('show-on-date/%s.json', show_date), opts)
       end
 
 
 
       # Get song by id or slug.
       #
-      # @param (see #show)
-      def song(id_or_slug)
+      # @param id_or_slug (see #show)
+      # @option opts (see #track)
+      def song(id_or_slug, opts={})
         check_id_arg('song', id_or_slug)
-        perform_get_request('songs/%s.json' % id_or_slug.to_s)
+        perform_get_request(format('songs/%s.json', id_or_slug.to_s), opts)
       end
 
       # Get many songs
       #
-      # @option (see #tracks)
+      # @option opts (see #tracks)
       def songs(opts={})
-        perform_get_request('songs.json', select_params(opts, DEFAULT_PARAMS))
+        perform_get_request('songs.json', opts)
       end
 
 
 
       # Get tour by id or slug.
       #
-      # @param (see #show)
-      def tour(id_or_slug)
+      # @param id_or_slug (see #show)
+      # @option opts (see #track)
+      def tour(id_or_slug, opts={})
         check_id_arg('tour', id_or_slug)
-        perform_get_request('tours/%s.json' % id_or_slug.to_s)
+        perform_get_request(format('tours/%s.json', id_or_slug.to_s), opts)
       end
 
       # Get many tours.
       #
-      # @option (see #tracks)
+      # @option opts (see #tracks)
       def tours(opts={})
-        perform_get_request('tours.json', select_params(opts, DEFAULT_PARAMS))
+        perform_get_request('tours.json', opts)
       end
 
 
 
       # Get venue by id or slug.
       #
-      # @param (see #show)
-      def venue(id_or_slug)
+      # @param id_or_slug (see #show)
+      # @option opts (see #track)
+      def venue(id_or_slug, opts={})
         check_id_arg('venue', id_or_slug)
-        perform_get_request('venues/%s.json' % id_or_slug.to_s)
+        perform_get_request(format('venues/%s.json', id_or_slug.to_s), opts)
       end
 
       # Get many venues.
       #
-      # @option (see #tracks)
+      # @option opts (see #tracks)
       def venues(opts={})
-        perform_get_request('venues.json', select_params(opts, DEFAULT_PARAMS))
+        perform_get_request('venues.json', opts)
       end
 
 
 
       # Get eras.
-      def eras
-        perform_get_request('eras.json')
+      #
+      # @option opts (see #track)
+      def eras(opts={})
+        perform_get_request('eras.json', opts)
       end
 
       # Get years.
-      def years
-        perform_get_request('years.json')
+      #
+      # @option opts (see #track)
+      def years(opts={})
+        perform_get_request('years.json', opts)
       end
 
 
 
       # @api private
-      def select_params(opts, keys)
-        params = {}
+      def select_params(params, keys)
+        _params = {}
         keys.each do |key|
-          params[key] = opts[key] if opts.key?(key)
+          _params[key] = params[key] if params.key?(key)
         end
-        return params
+        return _params
       end
 
       # @api private
@@ -126,12 +141,16 @@ module Phishin
       end
 
       # @api private
-      def perform_get_request(path, params={})
+      def perform_get_request(path, opts)
+        opts ||= {}
         url = [BASE_URL, path].join("/")
+        force  = opts.delete(:force)
+        params = opts.delete(:params) || {}
+        key = [path,
+                  [params.to_a.sort.map { |e| e.join('=')}].join('&')]
+                .join('?').chomp('?')
 
-        key = [path, [params.to_a.sort.map{|e| e.join('=')}].join('&')].join('?')
-
-        json_str = ::Phishin::Client::Cache.fetch(key) do
+        json_str = ::Phishin::Client::Cache.fetch(key, force: force) do
           logger.info "phish.in api GET url=#{url} params=#{params}" if logger
           RestClient.get(url, HEADERS.merge(params: params)).to_s
         end

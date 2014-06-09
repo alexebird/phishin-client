@@ -22,6 +22,7 @@ module Phishin
       # @option opts [Hash] :cache_options options to pass along to the cache.
       #   Leave blank to disable caching.
       def initialize(opts={})
+        opts ||= {}
         opts[:log]   = true if !opts.key?(:log)
         cache = opts[:cache] || true
         self.class.logger = opts[:log] ? (opts[:logger] || DEFAULT_LOGGER.call()) : nil
