@@ -1,5 +1,5 @@
 require 'rest-client'
-require 'oj'
+require 'json'
 require 'hashie'
 
 require 'phishin/api'
