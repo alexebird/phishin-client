@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "rest-client", "~> 1.6.7"
-  spec.add_runtime_dependency "oj", "~> 2.8.1"
+  spec.add_runtime_dependency "json", "~> 1.8.1"
   spec.add_runtime_dependency "hashie", "~> 2.1.1"
   spec.add_runtime_dependency "dalli", "~> 2.7.0"
   spec.add_runtime_dependency "redis", "~> 3.0.5"

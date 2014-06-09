@@ -155,7 +155,7 @@ module Phishin
           RestClient.get(url, HEADERS.merge(params: params)).to_s
         end
 
-        resp = Phishin::Api::Response.new(url, Oj.load(json_str))
+        resp = Phishin::Api::Response.new(url, JSON.load(json_str))
         assert_response_data_field(resp)
         return resp
       end
