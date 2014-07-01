@@ -10,7 +10,7 @@ module Phishin
       # @option opts [Boolean] :force (false) no caching for this request
       def track(id, opts={})
         check_id_arg('track', id)
-        perform_get_request(format('tracks/%d.json', id), nil, opts)
+        perform_get_request(format('tracks/%d.json', id), opts)
       end
 
       # Get many tracks.
