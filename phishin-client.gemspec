@@ -27,6 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "redis", "~> 3.0.5"
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "yard", "~> 0.8"
+  spec.add_development_dependency "yard", "~> 0.9.11"
 end
 
