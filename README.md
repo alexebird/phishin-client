@@ -29,6 +29,13 @@ json_hash = response.data
 response = c.tracks(params: { page: 1, per_page: 40 }, force: true)  # Phishin::Api::Response instance
 ```
 
+Info on releasing:
+
+```
+rake -T
+rake release
+```
+
 ## License
 
 Please see [LICENSE](https://github.com/alexebird/phishin-client/blob/master/LICENSE.txt).

@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "rest-client", "~> 1.6.7"
+  spec.add_runtime_dependency "rest-client", "~> 1.6"
   spec.add_runtime_dependency "json", "~> 1.8.1"
   spec.add_runtime_dependency "hashie", "~> 2.1.1"
   spec.add_runtime_dependency "dalli", "~> 2.7.0"
